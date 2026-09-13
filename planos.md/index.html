@@ -1,0 +1,2388 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-tema="escuro">
+
+<head>
+    <!-- ============================================
+       META & SEO
+  ============================================ -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="Chat IA Profissional — Múltiplos modelos, voz, memória e criptografia." />
+    <meta name="author" content="Sistema Modular Chat IA" />
+    <meta name="version" content="1.1" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Chat IA" />
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+
+    <title>Chat IA Profissional</title>
+
+    <!-- ============================================
+       GOOGLE FONTS
+  ============================================ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        /* ============================================
+       PARTE 1A — RESET & VARIÁVEIS CSS
+    ============================================ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            /* Cores Base — Tema Escuro (padrão) */
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: #1e293b;
+            --bg-input: #0f172a;
+            --bg-hover: #2d3f55;
+
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --text-inverse: #0f172a;
+
+            --accent-primary: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-light: #3b82f6;
+            --accent-glow: rgba(37, 99, 235, 0.25);
+
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #06b6d4;
+
+            --border-color: #334155;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --border-radius-lg: 20px;
+
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+
+            --sidebar-width: 280px;
+            --header-height: 60px;
+            --input-height: 56px;
+
+            --transition: 0.2s ease;
+            --transition-slow: 0.4s ease;
+
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-md: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+        }
+
+        /* Tema Claro */
+        [data-tema="claro"] {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e2e8f0;
+            --bg-card: #ffffff;
+            --bg-input: #f1f5f9;
+            --bg-hover: #e2e8f0;
+
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --text-inverse: #f1f5f9;
+
+            --border-color: #cbd5e1;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ============================================
+       PARTE 1B — BASE & LAYOUT PRINCIPAL
+    ============================================ */
+        html,
+        body {
+            height: 100%;
+            font-family: var(--font-family);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: var(--font-size-md);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        #app {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ============================================
+       PARTE 1C — SIDEBAR
+    ============================================ */
+        #sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform var(--transition-slow), width var(--transition-slow);
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        #sidebar.fechado {
+            transform: translateX(calc(-1 * var(--sidebar-width)));
+            position: absolute;
+        }
+
+        /* Cabeçalho da Sidebar */
+        #sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: var(--header-height);
+        }
+
+        #sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: var(--font-size-lg);
+            color: var(--accent-light);
+            text-decoration: none;
+        }
+
+        #sidebar-logo span.logo-icon {
+            font-size: 1.5rem;
+        }
+
+        #btn-fechar-sidebar {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: var(--border-radius-sm);
+            font-size: 1.2rem;
+            transition: color var(--transition), background var(--transition);
+            display: none;
+        }
+
+        #btn-fechar-sidebar:hover {
+            color: var(--text-primary);
+            background: var(--bg-hover);
+        }
+
+        /* Botão Novo Chat */
+        #btn-novo-chat {
+            margin: 12px 16px;
+            padding: 10px 16px;
+            background: var(--accent-primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background var(--transition), transform var(--transition);
+            width: calc(100% - 32px);
+        }
+
+        #btn-novo-chat:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Lista de Chats */
+        #lista-chats-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        #lista-chats-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #lista-chats-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #lista-chats-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            cursor: pointer;
+            border-radius: var(--border-radius-sm);
+            margin: 2px 8px;
+            transition: background var(--transition);
+            gap: 8px;
+        }
+
+        .chat-item:hover {
+            background: var(--bg-hover);
+        }
+
+        .chat-item.ativo {
+            background: var(--accent-glow);
+            border-left: 3px solid var(--accent-primary);
+        }
+
+        .chat-item-titulo {
+            flex: 1;
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-item-deletar {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity var(--transition), color var(--transition);
+        }
+
+        .chat-item:hover .chat-item-deletar {
+            opacity: 1;
+        }
+
+        .chat-item-deletar:hover {
+            color: var(--danger);
+        }
+
+        /* Ações da Sidebar */
+        #sidebar-acoes {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-sm);
+            font-family: var(--font-family);
+            transition: background var(--transition), color var(--transition);
+            width: 100%;
+            text-align: left;
+        }
+
+        .sidebar-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .sidebar-btn .btn-icon {
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* ============================================
+       PARTE 1D — ÁREA PRINCIPAL DO CHAT
+    ============================================ */
+        #main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-primary);
+        }
+
+        /* Header do Chat */
+        #chat-header {
+            height: var(--header-height);
+            padding: 0 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        #btn-toggle-sidebar {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: var(--border-radius-sm);
+            font-size: 1.2rem;
+            transition: color var(--transition), background var(--transition);
+        }
+
+        #btn-toggle-sidebar:hover {
+            color: var(--text-primary);
+            background: var(--bg-hover);
+        }
+
+        #chat-titulo {
+            flex: 1;
+            font-size: var(--font-size-md);
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #modelo-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        #modelo-badge .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulsar 2s infinite;
+        }
+
+        @keyframes pulsar {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* ============================================
+       PARTE 1E — ÁREA DE MENSAGENS
+    ============================================ */
+        #mensagens {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scroll-behavior: smooth;
+        }
+
+        #mensagens::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #mensagens::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #mensagens::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 6px;
+        }
+
+        /* Tela de Boas-Vindas */
+        #tela-boas-vindas {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            text-align: center;
+            gap: 16px;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        #tela-boas-vindas .welcome-icon {
+            font-size: 4rem;
+        }
+
+        #tela-boas-vindas h2 {
+            font-size: var(--font-size-xl);
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        #tela-boas-vindas p {
+            font-size: var(--font-size-sm);
+            max-width: 400px;
+        }
+
+        .sugestoes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 8px;
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .sugestao-btn {
+            padding: 12px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: var(--font-size-xs);
+            font-family: var(--font-family);
+            text-align: left;
+            transition: background var(--transition), border-color var(--transition), color var(--transition);
+            line-height: 1.4;
+        }
+
+        .sugestao-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        /* Bolhas de Mensagem */
+        .mensagem {
+            display: flex;
+            gap: 12px;
+            max-width: 85%;
+            animation: slideIn 0.2s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mensagem.usuario {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .mensagem.ia {
+            align-self: flex-start;
+        }
+
+        .mensagem.sistema {
+            align-self: center;
+            max-width: 100%;
+        }
+
+        .mensagem-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .mensagem.usuario .mensagem-avatar {
+            background: var(--accent-primary);
+        }
+
+        .mensagem.ia .mensagem-avatar {
+            background: var(--bg-tertiary);
+        }
+
+        .mensagem-conteudo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mensagem-balao {
+            padding: 12px 16px;
+            border-radius: var(--border-radius-lg);
+            font-size: var(--font-size-sm);
+            line-height: 1.65;
+            word-break: break-word;
+            position: relative;
+        }
+
+        .mensagem.usuario .mensagem-balao {
+            background: var(--accent-primary);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .mensagem.ia .mensagem-balao {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 4px;
+        }
+
+        .mensagem.sistema .mensagem-balao {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            font-size: var(--font-size-xs);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .mensagem-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+        }
+
+        .mensagem.usuario .mensagem-meta {
+            justify-content: flex-end;
+        }
+
+        .mensagem-acoes {
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+
+        .mensagem:hover .mensagem-acoes {
+            opacity: 1;
+        }
+
+        .msg-btn-acao {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            transition: color var(--transition), background var(--transition);
+        }
+
+        .msg-btn-acao:hover {
+            color: var(--text-primary);
+            background: var(--bg-hover);
+        }
+
+        /* Indicador de digitação */
+        #indicador-digitando {
+            display: none;
+            align-self: flex-start;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            border-bottom-left-radius: 4px;
+            gap: 6px;
+            align-items: center;
+        }
+
+        #indicador-digitando.visivel {
+            display: flex;
+        }
+
+        .dot-digitando {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            animation: bounce 1.2s infinite;
+        }
+
+        .dot-digitando:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot-digitando:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-6px);
+            }
+        }
+
+        /* ============================================
+       PARTE 1F — ÁREA DE INPUT
+    ============================================ */
+        #input-area {
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        #input-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 10px 14px;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+
+        #input-wrapper:focus-within {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        #inputChat {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            font-size: var(--font-size-sm);
+            resize: none;
+            max-height: 160px;
+            min-height: 24px;
+            line-height: 1.5;
+        }
+
+        #inputChat::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: var(--border-radius-sm);
+            font-size: 1.1rem;
+            transition: color var(--transition), background var(--transition);
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        .input-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-hover);
+        }
+
+        .input-btn.ativo {
+            color: var(--accent-light);
+        }
+
+        #btn-enviar {
+            background: var(--accent-primary);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px 10px;
+            border-radius: var(--border-radius-sm);
+            font-size: 1rem;
+            transition: background var(--transition), transform var(--transition);
+            flex-shrink: 0;
+        }
+
+        #btn-enviar:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+        }
+
+        #btn-enviar:disabled {
+            background: var(--bg-tertiary);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #input-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            padding: 0 4px;
+        }
+
+        /* ============================================
+       PARTE 1G — MODAIS (BASE)
+    ============================================ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.aberto {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-lg);
+            animation: modalEntrar 0.25s ease;
+        }
+
+        .modal.modal-lg {
+            max-width: 800px;
+        }
+
+        .modal.modal-sm {
+            max-width: 420px;
+        }
+
+        @keyframes modalEntrar {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .modal-titulo {
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-fechar {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: var(--border-radius-sm);
+            font-size: 1.2rem;
+            transition: color var(--transition), background var(--transition);
+        }
+
+        .modal-fechar:hover {
+            color: var(--text-primary);
+            background: var(--bg-hover);
+        }
+
+        .modal-corpo {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+        }
+
+        .modal-corpo::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .modal-corpo::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Abas dos Modais */
+        .modal-abas {
+            display: flex;
+            gap: 4px;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+            flex-shrink: 0;
+        }
+
+        .modal-abas::-webkit-scrollbar {
+            height: 0;
+        }
+
+        .aba-btn {
+            padding: 10px 16px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+            font-family: var(--font-family);
+            font-weight: 500;
+            white-space: nowrap;
+            transition: color var(--transition), border-color var(--transition);
+            margin-bottom: -1px;
+        }
+
+        .aba-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .aba-btn.ativa {
+            color: var(--accent-light);
+            border-bottom-color: var(--accent-primary);
+        }
+
+        .aba-painel {
+            display: none;
+        }
+
+        .aba-painel.ativo {
+            display: block;
+        }
+
+        /* ============================================
+       PARTE 1H — COMPONENTES DE FORMULÁRIO
+    ============================================ */
+        .form-grupo {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            font-size: var(--font-size-sm);
+            transition: border-color var(--transition), box-shadow var(--transition);
+            outline: none;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+            line-height: 1.5;
+        }
+
+        .form-select {
+            cursor: pointer;
+        }
+
+        .form-input[type="password"] {
+            letter-spacing: 0.1em;
+        }
+
+        .form-hint {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        /* Range Slider */
+        .form-range {
+            width: 100%;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+        }
+
+        .range-valor {
+            font-size: var(--font-size-xs);
+            color: var(--accent-light);
+            font-weight: 600;
+        }
+
+        /* Toggle Switch */
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+
+        .toggle-info {
+            flex: 1;
+        }
+
+        .toggle-info .toggle-titulo {
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .toggle-info .toggle-desc {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+        }
+
+        .toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: var(--bg-tertiary);
+            border-radius: 24px;
+            cursor: pointer;
+            transition: background var(--transition);
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            left: 3px;
+            top: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform var(--transition);
+        }
+
+        .toggle input:checked+.toggle-slider {
+            background: var(--accent-primary);
+        }
+
+        .toggle input:checked+.toggle-slider::before {
+            transform: translateX(20px);
+        }
+
+        /* ============================================
+       PARTE 1I — BOTÕES
+    ============================================ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-family: var(--font-family);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            transition: all var(--transition);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.85;
+        }
+
+        .btn-ghost {
+            background: none;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-ghost:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            opacity: 0.85;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: var(--font-size-xs);
+        }
+
+        .btn-lg {
+            padding: 12px 24px;
+            font-size: var(--font-size-md);
+        }
+
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ============================================
+       PARTE 1J — MODAL DE CONFIGURAÇÕES
+    ============================================ */
+        #modalConfig .secao-titulo {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin: 20px 0 12px;
+        }
+
+        #modalConfig .secao-titulo:first-child {
+            margin-top: 0;
+        }
+
+        .chave-api-wrapper {
+            position: relative;
+        }
+
+        .chave-api-wrapper .form-input {
+            padding-right: 44px;
+        }
+
+        .btn-ver-chave {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            font-size: 0.9rem;
+        }
+
+        .btn-ver-chave:hover {
+            color: var(--text-primary);
+        }
+
+        /* Seletor de Modelo */
+        .modelos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 8px;
+        }
+
+        .modelo-card {
+            padding: 12px;
+            background: var(--bg-input);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: border-color var(--transition), background var(--transition);
+            text-align: center;
+        }
+
+        .modelo-card:hover {
+            border-color: var(--accent-light);
+        }
+
+        .modelo-card.ativo {
+            border-color: var(--accent-primary);
+            background: var(--accent-glow);
+        }
+
+        .modelo-card .modelo-icon {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        .modelo-card .modelo-nome {
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modelo-card .modelo-desc {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ============================================
+       PARTE 1K — MODAL DE MEMÓRIA
+    ============================================ */
+        #modalMemoria .memoria-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-card .stat-valor {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            color: var(--accent-light);
+        }
+
+        .stat-card .stat-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .memoria-item {
+            padding: 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 8px;
+            font-size: var(--font-size-xs);
+        }
+
+        .memoria-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .memoria-tipo {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .memoria-tipo.conversa {
+            background: rgba(37, 99, 235, 0.2);
+            color: var(--accent-light);
+        }
+
+        .memoria-tipo.configuracao {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .memoria-tipo.nota {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+
+        .memoria-data {
+            color: var(--text-muted);
+        }
+
+        .memoria-preview {
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ============================================
+       PARTE 1L — MODAL PLAYGROUND
+    ============================================ -->
+    #modalPlayground .playground-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    #modalPlayground .playground-painel {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 16px;
+    }
+
+    #modalPlayground .playground-painel h4 {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    /* ============================================
+       PARTE 1M — MODAL DASHBOARD
+    ============================================ -->
+    #modalDashboard .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .dash-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 16px;
+    }
+
+    .dash-card .dash-valor { font-size: 2rem; font-weight: 700; color: var(--accent-light); }
+    .dash-card .dash-label { font-size: var(--font-size-xs); color: var(--text-muted); margin-top: 4px; }
+    .dash-card .dash-icon  { font-size: 1.5rem; margin-bottom: 8px; }
+
+    .recomendacoes-lista { list-style: none; }
+
+    .recomendacoes-lista li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+    }
+
+    .recomendacoes-lista li:last-child { border-bottom: none; }
+    .recomendacoes-lista li .rec-icon  { font-size: 1rem; flex-shrink: 0; margin-top: 2px; }
+
+    /* ============================================
+       PARTE 1N — NOTIFICAÇÕES / TOAST
+    ============================================ -->
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 18px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-md);
+      font-size: var(--font-size-sm);
+      color: var(--text-primary);
+      min-width: 260px;
+      max-width: 380px;
+      pointer-events: all;
+      animation: toastEntrar 0.3s ease;
+    }
+
+    .toast.saindo { animation: toastSair 0.3s ease forwards; }
+
+    @keyframes toastEntrar { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes toastSair   { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(20px); } }
+
+    .toast.sucesso { border-left: 4px solid var(--success); }
+    .toast.erro    { border-left: 4px solid var(--danger); }
+    .toast.aviso   { border-left: 4px solid var(--warning); }
+    .toast.info    { border-left: 4px solid var(--info); }
+
+    .toast-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .toast-msg  { flex: 1; }
+
+    /* ============================================
+       PARTE 1O — OVERLAY MOBILE
+    ============================================ -->
+    #sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 99;
+    }
+
+    /* ============================================
+       PARTE 1P — RESPONSIVIDADE
+    ============================================ -->
+    @media (max-width: 768px) {
+      :root { --sidebar-width: 100vw; }
+
+      #sidebar {
+        position: fixed;
+        transform: translateX(-100%);
+        transition: transform var(--transition-slow);
+      }
+
+      #sidebar.aberto {
+        transform: translateX(0);
+      }
+
+      #sidebar-overlay.visivel { display: block; }
+
+      #btn-fechar-sidebar { display: flex; }
+
+      .mensagem { max-width: 95%; }
+
+      .sugestoes-grid { grid-template-columns: 1fr; }
+
+      .form-row { grid-template-columns: 1fr; }
+
+      .modal { max-width: 100%; max-height: 95vh; margin: 0; border-radius: var(--border-radius) var(--border-radius) 0 0; align-self: flex-end; }
+
+      .modal-overlay { align-items: flex-end; padding: 0; }
+
+      #modalDashboard .dashboard-grid { grid-template-columns: 1fr; }
+
+      #toast-container { bottom: 80px; right: 12px; left: 12px; }
+      .toast { min-width: unset; max-width: 100%; }
+    }
+
+    @media (max-width: 480px) {
+      #chat-header { padding: 0 12px; }
+      #mensagens   { padding: 16px 12px; }
+      #input-area  { padding: 12px; }
+      .modal-corpo { padding: 16px; }
+      .modal-header{ padding: 16px; }
+    }
+
+    /* ============================================
+       PARTE 1Q — UTILITÁRIOS
+    ============================================ -->
+    .oculto   { display: none !important; }
+    .visivel  { display: block !important; }
+    .flex     { display: flex !important; }
+
+    .separador {
+      height: 1px;
+      background: var(--border-color);
+      margin: 16px 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .badge-success { background: rgba(34,197,94,0.15);  color: var(--success); }
+    .badge-danger  { background: rgba(239,68,68,0.15);  color: var(--danger); }
+    .badge-warning { background: rgba(245,158,11,0.15); color: var(--warning); }
+    .badge-info    { background: rgba(6,182,212,0.15);  color: var(--info); }
+
+    .codigo-bloco {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-sm);
+      padding: 12px 16px;
+      font-family: 'Courier New', monospace;
+      font-size: var(--font-size-xs);
+      color: var(--text-secondary);
+      overflow-x: auto;
+      white-space: pre;
+      margin: 8px 0;
+    }
+
+    /* Scrollbar global */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) transparent;
+        }
+
+        /* Seleção de texto */
+        ::selection {
+            background: var(--accent-glow);
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+
+        <!-- ============================================
+       SIDEBAR
+  ============================================ -->
+        <aside id="sidebar" role="navigation" aria-label="Menu lateral">
+
+            <!-- Cabeçalho -->
+            <div id="sidebar-header">
+                <a id="sidebar-logo" href="#" aria-label="Chat IA Profissional">
+                    <span class="logo-icon">🤖</span>
+                    <span>Chat IA</span>
+                </a>
+                <button id="btn-fechar-sidebar" aria-label="Fechar menu" title="Fechar menu">✕</button>
+            </div>
+
+            <!-- Novo Chat -->
+            <button id="btn-novo-chat" onclick="novoChat()" aria-label="Criar novo chat">
+      <span>✏️</span>
+      <span>Novo Chat</span>
+    </button>
+
+            <!-- Lista de Chats -->
+            <div id="lista-chats-container" role="list" aria-label="Histórico de chats">
+                <!-- Populado dinamicamente pelo app.js -->
+            </div>
+
+            <!-- Ações -->
+            <nav id="sidebar-acoes" aria-label="Ações do sistema">
+                <button class="sidebar-btn" onclick="abrirConfiguracoes()" title="Configurações">
+        <span class="btn-icon">⚙️</span> Config
+      </button>
+                <button class="sidebar-btn" onclick="abrirMemoria()" title="Memória contextual">
+        <span class="btn-icon">💾</span> Memória
+      </button>
+                <button class="sidebar-btn" onclick="abrirDashboard()" title="Dashboard de estatísticas">
+        <span class="btn-icon">📊</span> Dashboard
+      </button>
+                <button class="sidebar-btn" onclick="abrirPlayground()" title="Playground de testes">
+        <span class="btn-icon">🧪</span> Playground
+      </button>
+                <div class="separador"></div>
+                <button class="sidebar-btn" onclick="fazerBackup()" title="Exportar backup">
+        <span class="btn-icon">📦</span> Backup
+      </button>
+                <button class="sidebar-btn" onclick="importarBackup()" title="Importar backup">
+        <span class="btn-icon">📥</span> Importar
+      </button>
+                <button class="sidebar-btn" onclick="exportarDocumentacao()" title="Exportar documentação">
+        <span class="btn-icon">📚</span> Docs
+      </button>
+                <div class="separador"></div>
+                <button class="sidebar-btn" onclick="alternarTema()" title="Alternar tema claro/escuro" id="btn-tema">
+        <span class="btn-icon">🌙</span> Tema
+      </button>
+            </nav>
+
+        </aside>
+
+        <!-- Overlay Mobile -->
+        <div id="sidebar-overlay" onclick="fecharSidebar()" aria-hidden="true"></div>
+
+        <!-- ============================================
+       ÁREA PRINCIPAL
+  ============================================ -->
+        <main id="main" role="main">
+
+            <!-- Header do Chat -->
+            <header id="chat-header">
+                <button id="btn-toggle-sidebar" onclick="toggleSidebar()" aria-label="Abrir/fechar menu" title="Menu">
+        ☰
+      </button>
+                <span id="chat-titulo">Novo Chat</span>
+                <div id="modelo-badge" title="Modelo ativo">
+                    <span class="status-dot"></span>
+                    <span id="modelo-nome-badge">Monica</span>
+                </div>
+            </header>
+
+            <!-- Mensagens -->
+            <section id="mensagens" aria-live="polite" aria-label="Mensagens do chat">
+
+                <!-- Tela de Boas-Vindas -->
+                <div id="tela-boas-vindas">
+                    <div class="welcome-icon">🤖</div>
+                    <h2>Chat IA Profissional</h2>
+                    <p>Converse com múltiplos modelos de IA. Configure suas chaves de API e comece agora.</p>
+                    <div class="sugestoes-grid">
+                        <button class="sugestao-btn" onclick="usarSugestao(this)">💡 Explique um conceito complexo de forma simples</button>
+                        <button class="sugestao-btn" onclick="usarSugestao(this)">✍️ Ajude-me a escrever um e-mail profissional</button>
+                        <button class="sugestao-btn" onclick="usarSugestao(this)">🔍 Analise e melhore este código</button>
+                        <button class="sugestao-btn" onclick="usarSugestao(this)">🌐 Traduza e adapte culturalmente este texto</button>
+                    </div>
+                </div>
+
+                <!-- Indicador de Digitação -->
+                <div id="indicador-digitando" role="status" aria-label="IA digitando">
+                    <div class="dot-digitando"></div>
+                    <div class="dot-digitando"></div>
+                    <div class="dot-digitando"></div>
+                </div>
+
+            </section>
+
+            <!-- Área de Input -->
+            <footer id="input-area">
+                <div id="input-wrapper">
+                    <button class="input-btn" id="btn-voz" onclick="toggleVoz()" title="Reconhecimento de voz" aria-label="Ativar voz">🎤</button>
+                    <textarea
+          id="inputChat"
+          placeholder="Digite sua mensagem... (Enter para enviar, Shift+Enter para nova linha)"
+          rows="1"
+          aria-label="Campo de mensagem"
+          autocomplete="off"
+          spellcheck="true"
+        ></textarea>
+                    <button class="input-btn" id="btn-tts" onclick="toggleTTS()" title="Leitura em voz alta" aria-label="Ativar leitura">🔊</button>
+                    <button class="input-btn" onclick="anexarArquivo()" title="Anexar arquivo" aria-label="Anexar arquivo">📎</button>
+                    <button id="btn-enviar" onclick="enviarMensagem()" title="Enviar mensagem" aria-label="Enviar">➤</button>
+                </div>
+                <div id="input-info">
+                    <span id="input-contador">0 / 4096</span>
+                    <span id="input-dica">Enter para enviar • Shift+Enter para nova linha</span>
+                </div>
+                <!-- Input oculto para upload de arquivo -->
+                <input type="file" id="input-arquivo" style="display:none" accept=".txt,.md,.json,.csv,.pdf" />
+            </footer>
+
+        </main>
+
+    </div><!-- /#app -->
+
+
+    <!-- ============================================
+     MODAL — CONFIGURAÇÕES (PARTE 5)
+============================================ -->
+    <div id="modalConfig" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="config-titulo">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <span class="modal-titulo" id="config-titulo">⚙️ Configurações</span>
+                <button class="modal-fechar" onclick="fecharModal('modalConfig')" aria-label="Fechar">✕</button>
+            </div>
+
+            <!-- Abas -->
+            <div class="modal-abas" role="tablist">
+                <button class="aba-btn ativa" role="tab" onclick="mudarAba('config', 'chaves')"    data-aba="chaves">🔑 Chaves API</button>
+                <button class="aba-btn"       role="tab" onclick="mudarAba('config', 'modelos')"   data-aba="modelos">🤖 Modelos</button>
+                <button class="aba-btn"       role="tab" onclick="mudarAba('config', 'parametros')"data-aba="parametros">🎛️ Parâmetros</button>
+                <button class="aba-btn"       role="tab" onclick="mudarAba('config', 'perfil')"    data-aba="perfil">👤 Perfil</button>
+                <button class="aba-btn"       role="tab" onclick="mudarAba('config', 'seguranca')" data-aba="seguranca">🔐 Segurança</button>
+            </div>
+
+            <div class="modal-corpo">
+
+                <!-- Aba: Chaves API -->
+                <div id="config-aba-chaves" class="aba-painel ativo" role="tabpanel">
+                    <p class="form-hint" style="margin-bottom:16px">As chaves são armazenadas localmente no seu
+                        navegador.</p>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="chave-monica">🟣 Monica API Key</label>
+                        <div class="chave-api-wrapper">
+                            <input type="password" id="chave-monica" class="form-input" placeholder="mk-..." autocomplete="off" />
+                            <button class="btn-ver-chave" onclick="toggleVerChave('chave-monica')" title="Ver/ocultar">👁</button>
+                        </div>
+                        <p class="form-hint">Obtenha em: <a href="https://monica.im" target="_blank" rel="noopener"
+                                style="color:var(--accent-light)">monica.im</a></p>
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="chave-openai">🟢 OpenAI API Key</label>
+                        <div class="chave-api-wrapper">
+                            <input type="password" id="chave-openai" class="form-input" placeholder="sk-..." autocomplete="off" />
+                            <button class="btn-ver-chave" onclick="toggleVerChave('chave-openai')" title="Ver/ocultar">👁</button>
+                        </div>
+                        <p class="form-hint">Obtenha em: <a href="https://platform.openai.com" target="_blank"
+                                rel="noopener" style="color:var(--accent-light)">platform.openai.com</a></p>
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="chave-gemini">🔵 Google Gemini API Key</label>
+                        <div class="chave-api-wrapper">
+                            <input type="password" id="chave-gemini" class="form-input" placeholder="AIza..." autocomplete="off" />
+                            <button class="btn-ver-chave" onclick="toggleVerChave('chave-gemini')" title="Ver/ocultar">👁</button>
+                        </div>
+                        <p class="form-hint">Obtenha em: <a href="https://makersuite.google.com/app/apikey"
+                                target="_blank" rel="noopener"
+                                style="color:var(--accent-light)">makersuite.google.com</a></p>
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="chave-busca">🔍 Google Search API Key</label>
+                        <div class="chave-api-wrapper">
+                            <input type="password" id="chave-busca" class="form-input" placeholder="AIza..." autocomplete="off" />
+                            <button class="btn-ver-chave" onclick="toggleVerChave('chave-busca')" title="Ver/ocultar">👁</button>
+                        </div>
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="search-engine-id">🔍 Search Engine ID (CX)</label>
+                        <input type="text" id="search-engine-id" class="form-input" placeholder="cx:..." autocomplete="off" />
+                    </div>
+                </div>
+
+                <!-- Aba: Modelos -->
+                <div id="config-aba-modelos" class="aba-painel" role="tabpanel">
+                    <p class="form-hint" style="margin-bottom:16px">Selecione o modelo padrão para novos chats.</p>
+                    <div class="modelos-grid" id="modelos-grid">
+                        <div class="modelo-card ativo" onclick="selecionarModelo('monica')" data-modelo="monica">
+                            <div class="modelo-icon">🟣</div>
+                            <div class="modelo-nome">Monica</div>
+                            <div class="modelo-desc">claude-3-5-sonnet</div>
+                        </div>
+                        <div class="modelo-card" onclick="selecionarModelo('gpt4')" data-modelo="gpt4">
+                            <div class="modelo-icon">🟢</div>
+                            <div class="modelo-nome">GPT-4o</div>
+                            <div class="modelo-desc">OpenAI</div>
+                        </div>
+                        <div class="modelo-card" onclick="selecionarModelo('gpt35')" data-modelo="gpt35">
+                            <div class="modelo-icon">🟩</div>
+                            <div class="modelo-nome">GPT-3.5</div>
+                            <div class="modelo-desc">OpenAI Turbo</div>
+                        </div>
+                        <div class="modelo-card" onclick="selecionarModelo('gemini')" data-modelo="gemini">
+                            <div class="modelo-icon">🔵</div>
+                            <div class="modelo-nome">Gemini Pro</div>
+                            <div class="modelo-desc">Google</div>
+                        </div>
+                        <div class="modelo-card" onclick="selecionarModelo('gemini-flash')" data-modelo="gemini-flash">
+                            <div class="modelo-icon">⚡</div>
+                            <div class="modelo-nome">Gemini Flash</div>
+                            <div class="modelo-desc">Google Rápido</div>
+                        </div>
+                        <div class="modelo-card" onclick="selecionarModelo('local')" data-modelo="local">
+                            <div class="modelo-icon">🏠</div>
+                            <div class="modelo-nome">Local (Ollama)</div>
+                            <div class="modelo-desc">Privado</div>
+                        </div>
+                    </div>
+
+                    <div class="separador"></div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="url-local">🏠 URL Ollama Local</label>
+                        <input type="text" id="url-local" class="form-input" placeholder="http://localhost:11434" />
+                        <p class="form-hint">Para uso com modelos locais via Ollama</p>
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="modelo-local-nome">Nome do Modelo Local</label>
+                        <input type="text" id="modelo-local-nome" class="form-input" placeholder="llama3, mistral, gemma..." />
+                    </div>
+                </div>
+
+                <!-- Aba: Parâmetros -->
+                <div id="config-aba-parametros" class="aba-painel" role="tabpanel">
+
+                    <div class="form-grupo">
+                        <label class
+          <label class="form-label" for="temperatura">
+            🌡️ Temperatura
+            <span class="range-valor" id="val-temperatura">0.7</span>
+          </label>
+                        <input type="range" class="form-range" id="temperatura"
+                 min="0" max="2" step="0.1" value="0.7"
+                 oninput="document.getElementById('val-temperatura').textContent = this.value" />
+                        <p class="form-hint">0 = determinístico | 2 = muito criativo</p>
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="max-tokens">
+            📏 Máximo de Tokens
+            <span class="range-valor" id="val-tokens">2048</span>
+          </label>
+                        <input type="range" class="form-range" id="max-tokens"
+                 min="256" max="8192" step="256" value="2048"
+                 oninput="document.getElementById('val-tokens').textContent = this.value" />
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="top-p">
+            🎯 Top-P
+            <span class="range-valor" id="val-topp">0.9</span>
+          </label>
+                        <input type="range" class="form-range" id="top-p"
+                 min="0" max="1" step="0.05" value="0.9"
+                 oninput="document.getElementById('val-topp').textContent = this.value" />
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="frequencia-penalidade">
+            🔁 Penalidade de Frequência
+            <span class="range-valor" id="val-freq">0.0</span>
+          </label>
+                        <input type="range" class="form-range" id="frequencia-penalidade"
+                 min="-2" max="2" step="0.1" value="0"
+                 oninput="document.getElementById('val-freq').textContent = this.value" />
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="presenca-penalidade">
+            🆕 Penalidade de Presença
+            <span class="range-valor" id="val-pres">0.0</span>
+          </label>
+                        <input type="range" class="form-range" id="presenca-penalidade"
+                 min="-2" max="2" step="0.1" value="0"
+                 oninput="document.getElementById('val-pres').textContent = this.value" />
+                    </div>
+
+                    <div class="separador"></div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="sistema-prompt">💬 System Prompt Global</label>
+                        <textarea id="sistema-prompt" class="form-textarea" rows="5"
+                    placeholder="Você é um assistente profissional e prestativo..."></textarea>
+                        <p class="form-hint">Instrução base enviada em todos os chats</p>
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="contexto-msgs">
+            🧠 Mensagens de Contexto
+            <span class="range-valor" id="val-contexto">20</span>
+          </label>
+                        <input type="range" class="form-range" id="contexto-msgs"
+                 min="5" max="100" step="5" value="20"
+                 oninput="document.getElementById('val-contexto').textContent = this.value" />
+                        <p class="form-hint">Quantas mensagens anteriores enviar como contexto</p>
+                    </div>
+
+                    <div class="toggle-wrapper">
+                        <div class="toggle-info">
+                            <div class="toggle-titulo">🔍 Busca na Internet</div>
+                            <div class="toggle-desc">Permite que a IA busque informações atuais</div>
+                        </div>
+                        <label class="toggle">
+            <input type="checkbox" id="toggle-busca" />
+            <span class="toggle-slider"></span>
+          </label>
+                    </div>
+
+                    <div class="toggle-wrapper">
+                        <div class="toggle-info">
+                            <div class="toggle-titulo">💾 Salvar Histórico</div>
+                            <div class="toggle-desc">Mantém chats no localStorage</div>
+                        </div>
+                        <label class="toggle">
+            <input type="checkbox" id="toggle-historico" checked />
+            <span class="toggle-slider"></span>
+          </label>
+                    </div>
+
+                    <div class="toggle-wrapper">
+                        <div class="toggle-info">
+                            <div class="toggle-titulo">🧠 Memória Automática</div>
+                            <div class="toggle-desc">Extrai e salva contexto das conversas</div>
+                        </div>
+                        <label class="toggle">
+            <input type="checkbox" id="toggle-memoria-auto" checked />
+            <span class="toggle-slider"></span>
+          </label>
+                    </div>
+
+                    <div class="toggle-wrapper">
+                        <div class="toggle-info">
+                            <div class="toggle-titulo">✨ Streaming de Resposta</div>
+                            <div class="toggle-desc">Exibe resposta palavra por palavra</div>
+                        </div>
+                        <label class="toggle">
+            <input type="checkbox" id="toggle-streaming" checked />
+            <span class="toggle-slider"></span>
+          </label>
+                    </div>
+
+                </div><!-- /aba-parametros -->
+
+                <!-- Aba: Perfil -->
+                <div id="config-aba-perfil" class="aba-painel" role="tabpanel">
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="nome-usuario">👤 Seu Nome</label>
+                        <input type="text" id="nome-usuario" class="form-input" placeholder="Como a IA deve te chamar?" />
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="sobre-usuario">📝 Sobre Você</label>
+                        <textarea id="sobre-usuario" class="form-textarea" rows="3"
+                    placeholder="Profissão, interesses, contexto relevante..."></textarea>
+                        <p class="form-hint">Ajuda a IA a personalizar as respostas</p>
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="idioma-preferido">🌐 Idioma Preferido</label>
+                        <select id="idioma-preferido" class="form-select">
+            <option value="pt-BR">🇧🇷 Português (Brasil)</option>
+            <option value="pt-PT">🇵🇹 Português (Portugal)</option>
+            <option value="en-US">🇺🇸 English (US)</option>
+            <option value="es-ES">🇪🇸 Español</option>
+            <option value="fr-FR">🇫🇷 Français</option>
+            <option value="de-DE">🇩🇪 Deutsch</option>
+            <option value="ja-JP">🇯🇵 日本語</option>
+            <option value="zh-CN">🇨🇳 中文</option>
+          </select>
+                    </div>
+
+                    <div class="separador"></div>
+
+                    <p class="form-label" style="margin-bottom:12px">🔊 Configurações de Voz (TTS)</p>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="voz-velocidade">
+            ⚡ Velocidade da Voz
+            <span class="range-valor" id="val-voz-vel">1.15</span>
+          </label>
+                        <input type="range" class="form-range" id="voz-velocidade"
+                 min="0.5" max="2" step="0.05" value="1.15"
+                 oninput="document.getElementById('val-voz-vel').textContent = this.value" />
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="voz-pitch">
+            🎵 Tom da Voz
+            <span class="range-valor" id="val-voz-pitch">1.0</span>
+          </label>
+                        <input type="range" class="form-range" id="voz-pitch"
+                 min="0.5" max="2" step="0.1" value="1"
+                 oninput="document.getElementById('val-voz-pitch').textContent = this.value" />
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="voz-volume">
+            🔈 Volume
+            <span class="range-valor" id="val-voz-vol">1.0</span>
+          </label>
+                        <input type="range" class="form-range" id="voz-volume"
+                 min="0" max="1" step="0.1" value="1"
+                 oninput="document.getElementById('val-voz-vol').textContent = this.value" />
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="voz-seletor">🎤 Voz do Sistema</label>
+                        <select id="voz-seletor" class="form-select">
+            <option value="">Carregando vozes...</option>
+          </select>
+                        <p class="form-hint">Vozes disponíveis dependem do seu sistema operacional</p>
+                    </div>
+
+                    <div class="toggle-wrapper">
+                        <div class="toggle-info">
+                            <div class="toggle-titulo">🔊 TTS Automático</div>
+                            <div class="toggle-desc">Ler respostas da IA automaticamente</div>
+                        </div>
+                        <label class="toggle">
+            <input type="checkbox" id="toggle-tts-auto" />
+            <span class="toggle-slider"></span>
+          </label>
+                    </div>
+
+                </div><!-- /aba-perfil -->
+
+                <!-- Aba: Segurança -->
+                <div id="config-aba-seguranca" class="aba-painel" role="tabpanel">
+
+                    <div style="background:rgba(37,99,235,0.1);border:1px solid var(--accent-primary);
+                    border-radius:var(--border-radius);padding:14px;margin-bottom:20px">
+                        <p style="font-size:var(--font-size-sm);color:var(--text-secondary)">
+                            🔐 <strong style="color:var(--text-primary)">Criptografia AES-256-GCM</strong><br>
+            Protege suas chaves de API e dados sensíveis com senha mestre.
+            Sem a senha, os dados são ilegíveis.
+                        </p>
+                    </div>
+
+                    <div id="status-criptografia" style="margin-bottom:16px">
+                        <!-- Populado pelo app.js -->
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="senha-mestre">🔑 Senha Mestre</label>
+                        <div class="chave-api-wrapper">
+                            <input type="password" id="senha-mestre" class="form-input"
+                   placeholder="Mín. 12 chars: A-Z, a-z, 0-9, @$!%*?&"
+                   autocomplete="new-password" />
+                            <button class="btn-ver-chave" onclick="toggleVerChave('senha-mestre')">👁</button>
+                        </div>
+                    </div>
+
+                    <div class="form-grupo">
+                        <label class="form-label" for="senha-mestre-confirm">🔑 Confirmar Senha</label>
+                        <div class="chave-api-wrapper">
+                            <input type="password" id="senha-mestre-confirm" class="form-input"
+                   placeholder="Repita a senha mestre"
+                   autocomplete="new-password" />
+                            <button class="btn-ver-chave" onclick="toggleVerChave('senha-mestre-confirm')">👁</button>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:10px;flex-wrap:wrap">
+                        <button class="btn btn-primary" onclick="ativarCriptografia()">🔒 Ativar Criptografia</button>
+                        <button class="btn btn-ghost"   onclick="desativarCriptografia()">🔓 Desativar</button>
+                        <button class="btn btn-ghost"   onclick="gerenciadorCriptografia.gerarRelatorio()">📋 Relatório</button>
+                    </div>
+
+                    <div class="separador"></div>
+
+                    <p class="form-label" style="margin-bottom:12px">⚠️ Zona de Perigo</p>
+
+                    <div style="display:flex;gap:10px;flex-wrap:wrap">
+                        <button class="btn btn-danger btn-sm" onclick="confirmarLimparDados()">🗑️ Limpar Todos os Dados</button>
+                        <button class="btn btn-ghost  btn-sm" onclick="exportarChaves()">📤 Exportar Chaves (criptografado)</button>
+                    </div>
+
+                </div><!-- /aba-seguranca -->
+
+            </div><!-- /modal-corpo -->
+
+            <div class="modal-footer">
+                <button class="btn btn-ghost"   onclick="fecharModal('modalConfig')">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarConfiguracoes()">💾 Salvar Configurações</button>
+            </div>
+        </div>
+    </div><!-- /#modalConfig -->
+
+
+    <!-- ============================================
+     MODAL — MEMÓRIA (PARTE 5)
+============================================ -->
+    <div id="modalMemoria" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="memoria-titulo">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <span class="modal-titulo" id="memoria-titulo">💾 Memória Contextual</span>
+                <button class="modal-fechar" onclick="fecharModal('modalMemoria')" aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="modal-abas">
+                <button class="aba-btn ativa" onclick="mudarAba('memoria','registros')"   data-aba="registros">📋 Registros</button>
+                <button class="aba-btn"       onclick="mudarAba('memoria','adicionar')"   data-aba="adicionar">➕ Adicionar</button>
+                <button class="aba-btn"       onclick="mudarAba('memoria','estatisticas')"data-aba="estatisticas">📊 Estatísticas</button>
+            </div>
+
+            <div class="modal-corpo">
+
+                <!-- Aba: Registros -->
+                <div id="memoria-aba-registros" class="aba-painel ativo">
+                    <div class="memoria-stats" id="memoria-stats-mini">
+                        <div class="stat-card">
+                            <div class="stat-valor" id="mem-total">0</div>
+                            <div class="stat-label">Total</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-valor" id="mem-conversas">0</div>
+                            <div class="stat-label">Conversas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-valor" id="mem-notas">0</div>
+                            <div class="stat-label">Notas</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:8px;margin-bottom:14px">
+                        <input type="text" id="memoria-busca" class="form-input"
+                 placeholder="🔍 Buscar na memória..." style="flex:1"
+                 oninput="filtrarMemoria(this.value)" />
+                        <select id="memoria-filtro-tipo" class="form-select" style="width:140px"
+                  onchange="filtrarMemoria()">
+            <option value="">Todos os tipos</option>
+            <option value="conversa">Conversas</option>
+            <option value="configuracao">Configurações</option>
+            <option value="nota">Notas</option>
+          </select>
+                    </div>
+
+                    <div id="lista-memoria">
+                        <!-- Populado pelo app.js -->
+                        <p
+                            style="color:var(--text-muted);text-align:center;padding:40px 0;font-size:var(--font-size-sm)">
+                            Nenhum registro na memória ainda.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Aba: Adicionar -->
+                <div id="memoria-aba-adicionar" class="aba-painel">
+                    <div class="form-grupo">
+                        <label class="form-label" for="nova-nota-tipo">Tipo de Registro</label>
+                        <select id="nova-nota-tipo" class="form-select">
+            <option value="nota">📝 Nota</option>
+            <option value="configuracao">⚙️ Configuração</option>
+            <option value="conversa">💬 Conversa</option>
+          </select>
+                    </div>
+                    <div class="form-grupo">
+                        <label class="form-label" for="nova-nota-conteudo">Conteúdo</label>
+                        <textarea id="nova-nota-conteudo" class="form-textarea" rows="6"
+                    placeholder="Escreva o conteúdo do registro..."></textarea>
+                    </div>
+                    <div class="form-grupo">
+                        <label class="form-label" for="nova-nota-tags">Tags (separadas por vírgula)</label>
+                        <input type="text" id="nova-nota-tags" class="form-input"
+                 placeholder="trabalho, importante, projeto-x" />
+                    </div>
+                    <button class="btn btn-primary btn-full" onclick="adicionarMemoria()">
+          💾 Salvar na Memória
+        </button>
+                </div>
+
+                <!-- Aba: Estatísticas -->
+                <div id="memoria-aba-estatisticas" class="aba-painel">
+                    <div id="memoria-estatisticas-conteudo">
+                        <!-- Populado pelo app.js -->
+                    </div>
+                </div>
+
+            </div><!-- /modal-corpo -->
+
+            <div class="modal-footer">
+                <button class="btn btn-danger btn-sm" onclick="confirmarLimparMemoria()">🗑️ Limpar Memória</button>
+                <button class="btn btn-ghost"         onclick="exportarMemoria()">📤 Exportar</button>
+                <button class="btn btn-ghost"         onclick="fecharModal('modalMemoria')">Fechar</button>
+            </div>
+        </div>
+    </div><!-- /#modalMemoria -->
+
+
+    <!-- ============================================
+     MODAL — PLAYGROUND (PARTE 5)
+============================================ -->
+    <div id="modalPlayground" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="playground-titulo">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <span class="modal-titulo" id="playground-titulo">🧪 Playground</span>
+                <button class="modal-fechar" onclick="fecharModal('modalPlayground')" aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="modal-abas">
+                <button class="aba-btn ativa" onclick="mudarAba('playground','teste')"   data-aba="teste">🎯 Teste Rápido</button>
+                <button class="aba-btn"       onclick="mudarAba('playground','prompt')"  data-aba="prompt">✍️ Prompt Lab</button>
+                <button class="aba-btn"       onclick="mudarAba('playground','comparar')"data-aba="comparar">⚖️ Comparar Modelos</button>
+            </div>
+
+            <div class="modal-corpo">
+
+                <!-- Aba: Teste Rápido -->
+                <div id="playground-aba-teste" class="aba-painel ativo">
+                    <div class="form-grupo">
+                        <label class="form-label" for="pg-modelo">Modelo</label>
+                        <select id="pg-modelo" class="form-select">
+            <option value="monica">🟣 Monica</option>
+            <option value="gpt4">🟢 GPT-4o</option>
+            <option value="gemini">🔵 Gemini Pro</option>
+            <option value="local">🏠 Local</option>
+          </select>
+                    </div>
+                    <div class="form-grupo">
+                        <label class="form-label" for="pg-prompt">Prompt</label>
+                        <textarea id="pg-prompt" class="form-textarea" rows="4"
+                    placeholder="Digite seu prompt de teste..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-grupo">
+                            <label class="form-label" for="pg-temperatura">
+              Temperatura: <span class="range-valor" id="val-pg-temp">0.7</span>
+            </label>
+                            <input type="range" class="form-range" id="pg-temperatura"
+                   min="0" max="2" step="0.1" value="0.7"
+                   oninput="document.getElementById('val-pg-temp').textContent=this.value" />
+                        </div>
+                        <div class="form-grupo">
+                            <label class="form-label" for="pg-tokens">
+              Max Tokens: <span class="range-valor" id="val-pg-tok">1024</span>
+            </label>
+                            <input type="range" class="form-range" id="pg-tokens"
+                   min="256" max="4096" step="256" value="1024"
+                   oninput="document.getElementById('val-pg-tok').textContent=this.value" />
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="executarPlayground()">▶️ Executar</button>
+                    <div class="separador"></div>
+                    <label class="form-label">Resposta:</label>
+                    <div id="pg-resposta" class="codigo-bloco" style="min-height:80px;white-space:pre-wrap">
+                        Aguardando execução...
+                    </div>
+                    <div id="pg-metricas" style="font-size:var(--font-size-xs);color:var(--text-muted);margin-top:8px">
+                    </div>
+                </div>
+
+                <!-- Aba: Prompt Lab -->
+                <div id="playground-aba-prompt" class="aba-painel">
+                    <div class="form-grupo">
+                        <label class="form-label" for="pg-system">System Prompt</label>
+                        <textarea id="pg-system" class="form-textarea" rows="3"
+                    placeholder="Instrução de sistema..."></textarea>
+                    </div>
+                    <div class="form-grupo">
+                        <label class="form-label" for="pg-user">User Message</label>
+                        <textarea id="pg-user" class="form-textarea" rows="3"
+                    placeholder="Mensagem do usuário..."></textarea>
+                    </div>
+                    <div class="form-grupo">
+                        <label class="form-label" for="pg-assistant">Assistant Prefill (opcional)</label>
+                        <textarea id="pg-assistant" class="form-textarea" rows="2"
+                    placeholder="Início da resposta esperada..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="executarPromptLab()">▶️ Testar Prompt</button>
+                    <div class="separador"></div>
+                    <div id="pg-lab-resposta" class="codigo-bloco" style="min-height:80px;white-space:pre-wrap">
+                        Aguardando...
+                    </div>
+                </div>
+
+                <!-- Aba: Comparar Modelos -->
+                <div id="playground-aba-comparar" class="aba-painel">
+                    <div class="form-grupo">
+                        <label class="form-label" for="pg-comp-prompt">Prompt para Comparação</label>
+                        <textarea id="pg-comp-prompt" class="form-textarea" rows="3"
+                    placeholder="Digite o prompt para testar em múltiplos modelos..."></textarea>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+                        <label style="display:flex;align-items:center;gap:6px;font-size:var(--font-size-sm);color:var(--text-secondary);cursor:pointer">
+            <input type="checkbox" id="comp-monica"  checked /> 🟣 Monica
+          </label>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:var(--font-size-sm);color:var(--text-secondary);cursor:pointer">
+            <input type="checkbox" id="comp-gpt4"    checked /> 🟢 GPT-4o
+          </label>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:var(--font-size-sm);color:var(--text-secondary);cursor:pointer">
+            <input type="checkbox" id="comp-gemini"  checked /> 🔵 Gemini
+          </label>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:var(--font-size-sm);color:var(--text-secondary);cursor:pointer">
+            <input type="checkbox" id="comp-local"         /> 🏠 Local
+          </label>
+                    </div>
+                    <button class="btn btn-primary" onclick="compararModelos()">⚖️ Comparar</button>
+                    <div class="separador"></div>
+                    <div id="pg-comp-resultados" style="display:grid;gap:12px">
+                        <!-- Populado pelo app.js -->
+                    </div>
+                </div>
+
+            </div><!-- /modal-corpo -->
+
+            <div class="modal-footer">
+                <button class="btn btn-ghost btn-sm" onclick="limparPlayground()">🗑️ Limpar</button>
+                <button class="btn btn-ghost"        onclick="fecharModal('modalPlayground')">Fechar</button>
+            </div>
+        </div>
+    </div><!-- /#modalPlayground -->
+
+
+    <!-- ============================================
+     MODAL — DASHBOARD (PARTE 15)
+============================================ -->
+    <div id="modalDashboard" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="dashboard-titulo">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <span class="modal-titulo" id="dashboard-titulo">📊 Dashboard</span>
+                <button class="modal-fechar" onclick="fecharModal('modalDashboard')" aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="modal-corpo">
+
+                <!-- Cards de Estatísticas -->
+                <div class="dashboard-grid" id="dashboard-cards">
+                    <div class="dash-card">
+                        <div class="dash-icon">💬</div>
+                        <div class="dash-valor" id="dash-total-chats">0</div>
+                        <div class="dash-label">Total de Chats</div>
+                    </div>
+                    <div class="dash-card">
+                        <div class="dash-icon">📨</div>
+                        <div class="dash-valor" id="dash-total-msgs">0</div>
+                        <div class="dash-label">Mensagens Enviadas</div>
+                    </div>
+                    <div class="dash-card">
+                        <div class="dash-icon">💾</div>
+                        <div class="dash-valor" id="dash-espaco">0 KB</div>
+                        <div class="dash-label">Espaço Usado</div>
+                    </div>
+                    <div class="dash-card">
+                        <div class="dash-icon">🧠</div>
+                        <div class="dash-valor" id="dash-memorias">0</div>
+                        <div class="dash-label">Registros de Memória</div>
+                    </div>
+                </div>
+
+                <div class="separador"></div>
+
+                <!-- Uso por Modelo -->
+                <p class="form-label" style="margin-bottom:12px">🤖 Uso por Modelo</p>
+                <div id="dashboard-modelos" style="display:flex;flex-direction:column;gap:8px">
+                    <!-- Populado pelo app.js -->
+                </div>
+
+                <div class="separador"></div>
+
+                <!-- Recomendações -->
+                <p class="form-label" style="margin-bottom:12px">💡 Recomendações</p>
+                <ul class="recomendacoes-lista" id="dashboard-recomendacoes">
+                    <!-- Populado pelo app.js -->
+                </ul>
+
+            </div><!-- /modal-corpo -->
+
+            <div class="modal-footer">
+                <button class="btn btn-ghost btn-sm" onclick="gerenciadorDashboard.exportar()">📥 Exportar</button>
+                <button class="btn btn-ghost btn-sm" onclick="atualizarDashboard()">🔄 Atualizar</button>
+                <button class="btn btn-ghost"        onclick="fecharModal('modalDashboard')">Fechar</button>
+            </div>
+        </div>
+    </div><!-- /#modalDashboard -->
+
+
+    <!-- ============================================
+     MODAL — CONFIRMAÇÃO GENÉRICA
+============================================ -->
+    <div id="modalConfirm" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-titulo">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <span class="modal-titulo" id="confirm-titulo">⚠️ Confirmar</span>
+                <button class="modal-fechar" onclick="fecharModal('modalConfirm')" aria-label="Fechar">✕</button>
+            </div>
+            <div class="modal-corpo">
+                <p id="confirm-mensagem" style="color:var(--text-secondary);font-size:var(--font-size-sm)">
+                    Tem certeza que deseja continuar?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost"  onclick="fecharModal('modalConfirm')">Cancelar</button>
+                <button class="btn btn-danger" id="confirm-btn-ok" onclick="">Confirmar</button>
+            </div>
+        </div>
+    </div><!-- /#modalConfirm -->
+
+
+    <!-- ============================================
+     CONTAINER DE TOASTS (PARTE 4)
+============================================ -->
+    <div id="toast-container" aria-live="assertive" aria-atomic="true"></div>
+
+
+    <!-- ============================================
+     SCRIPT PRINCIPAL
+     ⚠️ DEVE SER O ÚLTIMO ELEMENTO ANTES DE </body>
+     Cole os módulos PARTE 0 até PARTE 15 em app.js
+============================================ -->
+    <script src="app.js/src/config-manager.js"></script>
+    <script src="app.js/src/gerenciador-ia.js"></script>
+    <script src="app.js/src/interface-chat.js"></script>
+    <script src="app.js/src/modais.js"></script>
+    <script src="app.js/src/temas.js"></script>
+    <script src="app.js/src/exportacao.js"></script>
+    <script src="app.js/src/config-manager.js"></script>
+    <script src="app.js/src/gerenciador-ia.js"></script>
+    <script src="app.js/src/interface-chat.js"></script>
+    <script src="app.js/src/modais.js"></script>
+    <script src="app.js/src/temas.js"></script>
+    <script src="app.js/src/exportacao.js"></script>
+    <script src="app.js"></script>
+    <script src="app.js"></script>
+    <script src="app.js"></script>
+    <script src="app.js"></script>
+    <script src="app.js"></script>
+
+</body>
+
+</html>
